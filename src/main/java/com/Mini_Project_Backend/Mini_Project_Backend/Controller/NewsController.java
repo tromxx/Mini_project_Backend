@@ -14,9 +14,9 @@ public class NewsController {
 
     // only get the news title
     @GetMapping("/News")
-    public ResponseEntity<List<NewsVO>> titleList(@RequestParam String news_no){
+    public ResponseEntity<List<String>> titleList(@RequestParam String news_no){
         NewsDAO dao = new NewsDAO();
-        List<NewsVO> titleLists = dao.getTitle();
+        List<String> titleLists = dao.getTitle();
         return new ResponseEntity<>(titleLists, HttpStatus.OK);
     }
 
