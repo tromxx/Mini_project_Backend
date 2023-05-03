@@ -48,7 +48,7 @@ public class NewsDAO {
             while (rs.next()){
                 String news_title = rs.getString("NEWS_TITLE");
                 String news_image = rs.getString("News_Image");
-                String news_content = rs.getString("News_Content");
+                Clob news_content = rs.getClob("News_Content");
 
                 NewsVO newsVO = new NewsVO();
                 newsVO.setNews_Title(news_title);
