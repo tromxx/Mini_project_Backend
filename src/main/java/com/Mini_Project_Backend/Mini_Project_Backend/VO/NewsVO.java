@@ -10,7 +10,7 @@ public class NewsVO {
     private  int news_No;
     private String news_Title;
     private String news_Image;
-    private Clob news_Content;
+    private String news_Content;
 
 
 }

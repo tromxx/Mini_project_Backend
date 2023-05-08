@@ -8,7 +8,10 @@ import lombok.Getter;
 public class TeamVO {
     private String team_Name;
     private int team_Win;
+    private int team_Draw;
     private int team_Lose;
-    private int team_Win_Ratio;
+    private float team_Win_Ratio;
+    private float team_GameBehind;
 
+    private int teamRanking;
 }
