@@ -12,6 +12,5 @@ public class TeamVO {
     private int team_Lose;
     private float team_Win_Ratio;
     private float team_GameBehind;
-
-    private int teamRanking;
+    private int team_Ranking;
 }
