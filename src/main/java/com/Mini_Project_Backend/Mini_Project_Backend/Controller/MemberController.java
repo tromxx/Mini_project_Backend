@@ -3,6 +3,7 @@ package com.Mini_Project_Backend.Mini_Project_Backend.Controller;
 import com.Mini_Project_Backend.Mini_Project_Backend.DAO.MemberDAO;
 import com.Mini_Project_Backend.Mini_Project_Backend.VO.MemberVO;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -22,6 +23,8 @@ import java.util.UUID;
 @RestController
 
 public class MemberController {
+    @Autowired
+    private JavaMailSender mailSender;
     // POST : 로그인
 
     @PostMapping("/login")
@@ -57,33 +60,40 @@ public class MemberController {
     public ResponseEntity<Boolean> memberRegister(@RequestBody Map<String, String> regData) {
         String getId = regData.get("id");
         String getPwd = regData.get("pwd");
-        String getName = regData.get("name");
-        String getMail = regData.get("mail");
+        String getNickname = regData.get("Nickname");
         MemberDAO dao = new MemberDAO();
-        boolean isTrue = dao.memberRegister(getId, getPwd, getName, getMail);
+        boolean isTrue = dao.memberRegister(getId, getPwd, getNickname);
 
         // 회원 가입이 성공하면 이메일 인증 링크 전송
         if (isTrue) {
             // 임의의 인증키 생성
             String authKey = UUID.randomUUID().toString();
-
+            System.out.println(authKey);
             // 인증키를 DB에 저장 및 만료 시간 설정
-            long expireTimeMillis = System.currentTimeMillis() + 24 * 60 * 60 * 1000; // 24시간 뒤
+            long expireTimeMillis = System.currentTimeMillis() + 60 * 60 * 1000; // 1시간 뒤
             Timestamp expireTime = new Timestamp(expireTimeMillis);
+            System.out.println(expireTime);
             dao.updateAuthKey(getId, authKey, expireTime);
 
             // 이메일 인증 링크 생성
-            String emailLink = "http://localhost:8080/emailAuth?email=" + getMail + "&authKey=" + authKey + "&expireTime=" + expireTime;
+            String emailLink = "http://localhost:8080/emailAuth?email=" + getId + "&authKey=" + authKey + "&expireTime=" + expireTime;
+            System.out.println(emailLink);
+            // 인증 이메일에 들어갈 내용
+            String htmlContent = "<div style=\"text-align: center;\">"
+                    + "<p style=\"font-size: 16px;\">벤치클리어링 인증 메일입니다.</p>"
+                    + "<a href=\"" + emailLink + "\" style=\"display: inline-block; background-color: #007bff; color: #ffffff; padding: 10px 20px; border-radius: 5px; text-decoration: none;\">인증하기</a>"
+                    + "<p style=\"font-size: 12px;\">이 인증 링크는 생성 후 한 시간까지 유효합니다.</p>"
+                    + "</div>";
 
             // 이메일 인증 링크를 이메일로 전송
-            JavaMailSender mailSender = new JavaMailSenderImpl();
+
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "UTF-8");
             try {
-                helper.setFrom("보내는 이메일 주소");
-                helper.setTo(getMail);
-                helper.setSubject("이메일 인증");
-                helper.setText(emailLink);
+                helper.setFrom("benchclearing@naver.com");
+                helper.setTo(getId);
+                helper.setSubject("Bench Clearing 이메일 인증");
+                helper.setText(htmlContent, true);
             } catch (MessagingException e) {
                 e.printStackTrace();
             }
@@ -93,9 +103,9 @@ public class MemberController {
         return new ResponseEntity<>(isTrue, HttpStatus.OK);
     }
     @GetMapping("/emailAuth")
-    public ResponseEntity<String> emailAuth(@RequestParam String email, @RequestParam String authKey) {
+    public ResponseEntity<String> emailAuth(@RequestParam String id, @RequestParam String authKey) {
         MemberDAO dao = new MemberDAO();
-        boolean result = dao.updateAuthKeyByAuthKey(email, authKey);
+        boolean result = dao.updateAuthKeyByAuthKey(id, authKey);
         if (result) {
             return new ResponseEntity<>("이메일 인증에 성공하였습니다.", HttpStatus.OK);
         } else {

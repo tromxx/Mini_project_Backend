@@ -11,7 +11,6 @@ import java.sql.Date;
 public class MemberVO {
     private String id;
     private String pwd;
-    private String name;
-    private String email;
+    private String nickname;
     private Date join;
 }
