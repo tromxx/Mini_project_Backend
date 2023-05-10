@@ -25,6 +25,9 @@ import java.util.UUID;
 public class MemberController {
     @Autowired
     private JavaMailSender mailSender;
+
+    String backend = "http://localhost:8111";
+    String frontend = "http://localhost:3000";
     // POST : 로그인
 
     @PostMapping("/login")
@@ -44,6 +47,14 @@ public class MemberController {
         System.out.println("ID : " + id);
         MemberDAO dao = new MemberDAO();
         List<MemberVO> list = dao.memberSelect(id);
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    @GetMapping("/nickname")
+    public ResponseEntity<List<MemberVO>> nicknameList(@RequestParam String nickname) {
+        System.out.println("nickname : " + nickname);
+        MemberDAO dao = new MemberDAO();
+        List<MemberVO> list = dao.memberSelect(nickname);
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
@@ -76,7 +87,7 @@ public class MemberController {
             dao.updateAuthKey(getId, authKey, expireTime);
 
             // 이메일 인증 링크 생성
-            String emailLink = "http://localhost:8111/emailAuth?id=" + getId + "&authKey=" + authKey;
+            String emailLink = backend + "/emailAuth?id=" + getId + "&authKey=" + authKey;
             System.out.println(emailLink);
             // 인증 이메일에 들어갈 내용
             String htmlContent = "<div style=\"text-align: center;\">"
@@ -108,7 +119,7 @@ public class MemberController {
         MemberDAO dao = new MemberDAO();
         boolean result = dao.updateAuthKeyByAuthKey(id, authKey);
 
-        return new RedirectView("http://localhost:3000/login");
+        return new RedirectView(frontend + "/login");
     }
 
 
