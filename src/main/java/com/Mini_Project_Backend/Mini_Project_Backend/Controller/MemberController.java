@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.bind.annotation.*;
 
@@ -76,7 +76,7 @@ public class MemberController {
             dao.updateAuthKey(getId, authKey, expireTime);
 
             // 이메일 인증 링크 생성
-            String emailLink = "http://localhost:8080/emailAuth?email=" + getId + "&authKey=" + authKey + "&expireTime=" + expireTime;
+            String emailLink = "http://localhost:8111/emailAuth?id=" + getId + "&authKey=" + authKey;
             System.out.println(emailLink);
             // 인증 이메일에 들어갈 내용
             String htmlContent = "<div style=\"text-align: center;\">"
@@ -102,16 +102,15 @@ public class MemberController {
 
         return new ResponseEntity<>(isTrue, HttpStatus.OK);
     }
+
     @GetMapping("/emailAuth")
-    public ResponseEntity<String> emailAuth(@RequestParam String id, @RequestParam String authKey) {
+    public RedirectView emailAuth(@RequestParam String id, @RequestParam String authKey) {
         MemberDAO dao = new MemberDAO();
         boolean result = dao.updateAuthKeyByAuthKey(id, authKey);
-        if (result) {
-            return new ResponseEntity<>("이메일 인증에 성공하였습니다.", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("이메일 인증에 실패하였습니다.", HttpStatus.OK);
-        }
+
+        return new RedirectView("http://localhost:3000/login");
     }
+
 
     // POST : 회원 탈퇴
     @PostMapping("/del")
