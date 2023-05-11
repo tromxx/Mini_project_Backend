@@ -15,15 +15,6 @@ public class NewsDAO {
     private ResultSet rs = null;
     private PreparedStatement pStmt = null;
 
-<<<<<<< HEAD
-    //Get the only new Title
-    public List<String> getTitle(){
-        List<String> list = new ArrayList<>();
-        try{
-            conn = Common.getConnection();
-            stmt = conn.createStatement();
-            String sql = "SELECT NEWS_TITLE FROM NEWS";
-=======
     //최신 뉴스 기준으로 가죠오기
     public List<NewsVO> getTitle(){
         List<NewsVO> list = new ArrayList<>();
@@ -31,14 +22,10 @@ public class NewsDAO {
             conn = Common.getConnection();
             stmt = conn.createStatement();
             String sql = "SELECT NEWS_NO, NEWS_TITLE, NEWS_IMAGE_URL,NEWS_SHORT_CONTENT, NEWS_DATE FROM NEWS order by news_date";
->>>>>>> Trom
             rs = stmt.executeQuery(sql);
 
             while(rs.next()){
                 String news_Title = rs.getString("NEWS_TITLE");
-<<<<<<< HEAD
-                list.add(news_Title);
-=======
                 String news_Image_Url = rs.getString("NEWS_IMAGE_URL");
                 String news_Short_Content = rs.getString("NEWS_SHORT_CONTENT");
                 Date news_Date = rs.getDate("NEWS_DATE");
@@ -49,7 +36,6 @@ public class NewsDAO {
                 newsVO.setNews_Short_Content(news_Short_Content);
                 newsVO.setNews_Date(news_Date);
                 list.add(newsVO);
->>>>>>> Trom
             }
             Common.close(rs);
             Common.close(stmt);
