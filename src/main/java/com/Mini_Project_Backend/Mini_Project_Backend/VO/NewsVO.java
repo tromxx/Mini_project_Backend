@@ -14,6 +14,5 @@ public class NewsVO {
     private String news_Short_Content;
     private String news_Long_Content;
     private Date news_Date;
-
-
+    private String getTesting;
 }
