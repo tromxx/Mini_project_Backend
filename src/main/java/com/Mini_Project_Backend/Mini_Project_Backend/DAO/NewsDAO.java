@@ -71,5 +71,4 @@ public class NewsDAO {
         return  list;
     }
 
-
 }
