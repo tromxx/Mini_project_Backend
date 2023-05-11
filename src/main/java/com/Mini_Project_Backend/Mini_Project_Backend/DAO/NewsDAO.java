@@ -15,22 +15,27 @@ public class NewsDAO {
     private ResultSet rs = null;
     private PreparedStatement pStmt = null;
 
-    //뉴스 번호 제목 가지고 오기
+    //최신 뉴스 기준으로 가죠오기
     public List<NewsVO> getTitle(){
         List<NewsVO> list = new ArrayList<>();
         try{
             conn = Common.getConnection();
             stmt = conn.createStatement();
-            String sql = "SELECT NEWS_NO, NEWS_TITLE FROM NEWS";
+            String sql = "SELECT NEWS_NO, NEWS_TITLE, NEWS_IMAGE_URL,NEWS_SHORT_CONTENT, NEWS_DATE FROM NEWS order by news_date";
             rs = stmt.executeQuery(sql);
 
             while(rs.next()){
                 int news_No = rs.getInt("NEWS_NO");
                 String news_Title = rs.getString("NEWS_TITLE");
+                String news_Image_Url = rs.getString("NEWS_IMAGE_URL");
+                String news_Short_Content = rs.getString("NEWS_SHORT_CONTENT");
+                Date news_Date = rs.getDate("NEWS_DATE");
                 NewsVO newsVO = new NewsVO();
                 newsVO.setNews_No(news_No);
                 newsVO.setNews_Title(news_Title);
-
+                newsVO.setNews_Image_Url(news_Image_Url);
+                newsVO.setNews_Short_Content(news_Short_Content);
+                newsVO.setNews_Date(news_Date);
                 list.add(newsVO);
             }
             Common.close(rs);
@@ -58,8 +63,6 @@ public class NewsDAO {
                 NewsVO newsVO = new NewsVO();
                 newsVO.setNews_No(news_No);
                 newsVO.setNews_Title(news_title);
-                newsVO.setNews_Image(news_image);
-                newsVO.setNews_Content(news_content);
                 list.add(newsVO);
             }
         }catch (Exception e){
