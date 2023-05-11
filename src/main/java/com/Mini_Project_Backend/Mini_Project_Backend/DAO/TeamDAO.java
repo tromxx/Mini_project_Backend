@@ -37,7 +37,7 @@ public class TeamDAO {
                 teamVO.setTeam_Lose(team_Lose);
                 teamVO.setTeam_Win_Ratio(team_Win_Ratio);
                 teamVO.setTeam_GameBehind(team_GameBhind);
-                teamVO.setTeam_Ranking(team_Ranking);
+                //teamVO.setTeam_Ranking(team_Ranking);
 
                 list.add(teamVO);
             }
