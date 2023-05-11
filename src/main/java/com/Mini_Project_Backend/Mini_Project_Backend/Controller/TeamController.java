@@ -11,9 +11,9 @@ import java.util.List;
 public class TeamController {
 
     @GetMapping("/")
-    public ResponseEntity<List<TeamVO>> getTeamInfo(@RequestParam String team){
-        TeamDAO dao = new TeamDAO();
-        List<TeamVO> list = dao.getTeamRanking();
-        return new ResponseEntity<>(list, HttpStatus.OK);
+    public ResponseEntity<List<TeamVO>> teamRanking(@RequestParam String x){
+        TeamDAO teamDAO = new TeamDAO();
+        List<TeamVO> teamVOList = teamDAO.getTeamRanking();
+        return new ResponseEntity<>(teamVOList, HttpStatus.OK);
     }
 }
