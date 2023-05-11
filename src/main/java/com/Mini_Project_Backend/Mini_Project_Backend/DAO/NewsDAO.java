@@ -22,21 +22,39 @@ public class NewsDAO {
             conn = Common.getConnection();
             stmt = conn.createStatement();
             String sql = "SELECT NEWS_NO, NEWS_TITLE, NEWS_IMAGE_URL,NEWS_SHORT_CONTENT, NEWS_DATE FROM NEWS order by news_date";
+<<<<<<< Updated upstream
             rs = stmt.executeQuery(sql);
 
             while(rs.next()){
                 int news_No = rs.getInt("NEWS_NO");
                 String news_Title = rs.getString("NEWS_TITLE");
+=======
+
+            rs = stmt.executeQuery(sql);
+
+            while(rs.next()){
+
+                int news_No = rs.getInt("NEWS_NO");
+                String news_Title = rs.getString("NEWS_TITLE");
+
+
+
+>>>>>>> Stashed changes
                 String news_Image_Url = rs.getString("NEWS_IMAGE_URL");
                 String news_Short_Content = rs.getString("NEWS_SHORT_CONTENT");
                 Date news_Date = rs.getDate("NEWS_DATE");
                 NewsVO newsVO = new NewsVO();
+
                 newsVO.setNews_No(news_No);
                 newsVO.setNews_Title(news_Title);
                 newsVO.setNews_Image_Url(news_Image_Url);
                 newsVO.setNews_Short_Content(news_Short_Content);
                 newsVO.setNews_Date(news_Date);
                 list.add(newsVO);
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
             }
             Common.close(rs);
             Common.close(stmt);
@@ -59,7 +77,7 @@ public class NewsDAO {
                 int news_No = rs.getInt("NEWS_NO");
                 String news_title = rs.getString("NEWS_TITLE");
                 String news_image = rs.getString("News_Image");
-                String news_content = rs.getString("News_Content");
+                String news_Long_Content = rs.getString("NEW_LONG_CONTENT");
                 NewsVO newsVO = new NewsVO();
                 newsVO.setNews_No(news_No);
                 newsVO.setNews_Title(news_title);
