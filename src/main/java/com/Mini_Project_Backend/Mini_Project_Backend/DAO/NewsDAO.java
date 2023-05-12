@@ -25,6 +25,7 @@ public class NewsDAO {
             rs = stmt.executeQuery(sql);
 
             while(rs.next()){
+                int news_No = rs.getInt("NEWS_NO");
                 String news_Title = rs.getString("NEWS_TITLE");
                 String news_Image_Url = rs.getString("NEWS_IMAGE_URL");
                 String news_Short_Content = rs.getString("NEWS_SHORT_CONTENT");
