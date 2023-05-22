@@ -75,7 +75,7 @@ public class MemberDAO {
         return list;
     }
 
-    // 회원 가입 여부 확인
+    // 회원 가입 여부 확인(아이디)
     public boolean regMemberCheck(String id) {
         boolean isNotReg = false;
         try {
@@ -92,6 +92,25 @@ public class MemberDAO {
         Common.close(conn);
         return isNotReg; // 가입 되어 있으면 false, 가입이 안되어 있으면 true
     }
+
+    // 닉네임 중복 여부 확인
+    public boolean nicknameCheck(String nickname) {
+        boolean isAlready = false;
+        try {
+            conn = Common.getConnection();
+            stmt = conn.createStatement();
+            String sql = "SELECT * FROM MEMBER WHERE NICKNAME = " + "'" + nickname + "'";
+            rs = stmt.executeQuery(sql);
+            if (!rs.next()) isAlready = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Common.close(rs);
+        Common.close(stmt);
+        Common.close(conn);
+        return isAlready; // 이미 존재하는 닉네임이면 false, 존재하지 않는 닉네임이면 true
+    }
+
 
 
     // 회원 가입
@@ -202,4 +221,6 @@ public class MemberDAO {
         }
         return result;
     }
+
+
 }

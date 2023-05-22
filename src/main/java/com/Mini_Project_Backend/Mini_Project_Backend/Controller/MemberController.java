@@ -3,6 +3,7 @@ package com.Mini_Project_Backend.Mini_Project_Backend.Controller;
 import com.Mini_Project_Backend.Mini_Project_Backend.DAO.MemberDAO;
 import com.Mini_Project_Backend.Mini_Project_Backend.VO.MemberVO;
 
+import oracle.ucp.proxy.annotation.Post;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import javax.mail.internet.MimeMessage;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -51,11 +53,11 @@ public class MemberController {
     }
 
     @GetMapping("/nickname")
-    public ResponseEntity<List<MemberVO>> nicknameList(@RequestParam String nickname) {
+    public ResponseEntity<Boolean> nicknameList(@RequestParam String nickname) {
         System.out.println("nickname : " + nickname);
         MemberDAO dao = new MemberDAO();
-        List<MemberVO> list = dao.memberSelect(nickname);
-        return new ResponseEntity<>(list, HttpStatus.OK);
+        boolean isAlready = dao.nicknameCheck(nickname);
+        return new ResponseEntity<>(isAlready, HttpStatus.OK);
     }
 
     // GET : 회원 가입 여부 확인
@@ -131,5 +133,4 @@ public class MemberController {
         boolean isTrue = dao.memberDelete(getId);
         return new ResponseEntity<>(isTrue, HttpStatus.OK);
     }
-
 }

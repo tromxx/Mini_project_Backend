@@ -1,4 +1,5 @@
 package com.Mini_Project_Backend.Mini_Project_Backend.Controller;
+
 import com.Mini_Project_Backend.Mini_Project_Backend.DAO.NewsDAO;
 import com.Mini_Project_Backend.Mini_Project_Backend.VO.NewsVO;
 import org.springframework.http.HttpStatus;
@@ -11,20 +12,28 @@ import java.util.List;
 
 public class NewsController {
 
-    // 최신뉴스 가죠오기
+    //뉴스 shortContent 정보 가죠오기
     @GetMapping("/News")
-    public ResponseEntity<List<NewsVO>> titleList(@RequestParam String news_no){
+    public ResponseEntity< List<NewsVO>> getShortDetailNews(@RequestParam String cat, int page){
         NewsDAO dao = new NewsDAO();
-        List<NewsVO> titleLists = dao.getLatestNews();
-        return new ResponseEntity<>(titleLists, HttpStatus.OK);
+        List<NewsVO> news = dao.getNews(cat, page);
+        return new ResponseEntity<>(news, HttpStatus.OK);
     }
-    // 뉴스 번호로 제목, 이미지, 코텐츠 가져오기
+
+    //Pagination 을 위해 News total 사이즈 가죠오기
+    @GetMapping("/News/TotalPage")
+    public ResponseEntity<List<Integer>> getNewsPage(@RequestParam String cat){
+        NewsDAO dao = new NewsDAO();
+        List<Integer> news = dao.getNewsPage(cat);
+        return new ResponseEntity<>(news, HttpStatus.OK);
+    }
+
+
+    // 뉴스 번호로 제목, 이미지, Long Content 가져오기
     @GetMapping("/News/View")
-    public ResponseEntity<List<NewsVO>> newsInfo(@RequestParam int news_no){
+    public ResponseEntity<List<NewsVO>> getLongDetailNews(@RequestParam int news_no){
         NewsDAO dao = new NewsDAO();
         List<NewsVO> newsInfoList = dao.getNewsInfo(news_no);
         return new ResponseEntity<>(newsInfoList, HttpStatus.OK);
     }
-
-
 }
