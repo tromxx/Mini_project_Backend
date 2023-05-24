@@ -15,7 +15,7 @@ public class BoardController {
     @GetMapping("/HomePlate")
     public ResponseEntity<Map<String, Object>> getTotalPageBoard(@RequestParam String cat){
         BoardDAO boardDAO = new BoardDAO();
-        Map<String,Object> list = boardDAO.getTotalPageBoard();
+        Map<String,Object> list = boardDAO.getShortBoard();
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
@@ -27,14 +27,17 @@ public class BoardController {
     }
 
     @GetMapping("/HomePlate/Views")
-    public ResponseEntity<List<BoardVO>> getLongBoard(@RequestParam int boardno) {
+    public ResponseEntity<List<BoardVO>> getLongBoard(@RequestParam int boardNo) {
         BoardDAO boardDAO = new BoardDAO();
-        List<BoardVO> list = boardDAO.getLongBoard(boardno);
+        List<BoardVO> list = boardDAO.getLongBoard(boardNo);
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
+    @GetMapping("/Latest")
+    public ResponseEntity<List<BoardVO>> getLatestBoard(@RequestParam String cat) {
+        BoardDAO boardDAO = new BoardDAO();
 
-
-
-
+        List<BoardVO> list = boardDAO.getBoardLatest();
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
 }

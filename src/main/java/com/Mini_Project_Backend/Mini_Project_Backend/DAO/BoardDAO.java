@@ -2,7 +2,6 @@ package com.Mini_Project_Backend.Mini_Project_Backend.DAO;
 
 import com.Mini_Project_Backend.Mini_Project_Backend.Common.Common;
 import com.Mini_Project_Backend.Mini_Project_Backend.VO.BoardVO;
-
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
@@ -14,7 +13,7 @@ public class BoardDAO {
     private PreparedStatement pStmt = null;
 
     // 보드 ALL 가죠오기 첫번쨰
-    public Map<String, Object> getTotalPageBoard() {
+    public Map<String, Object> getShortBoard() {
         Map<String, Object> data = new HashMap<>();
         try {
             String sql = "SELECT COUNT(*) FROM BOARD";
@@ -23,7 +22,7 @@ public class BoardDAO {
             rs = stmt.executeQuery(sql);
             rs.next();
             int totalData = rs.getInt("COUNT(*)");
-            data.put("totalData", totalData);
+            data.put("TotalData", totalData);
             Common.close(rs);
             Common.close(stmt);
             Common.close(conn);
@@ -121,7 +120,7 @@ public class BoardDAO {
         return  list;
     }
 
-    // 화면 첫페이지 가기고 오기
+    // 최신순 10개 가죠오기
     public List<BoardVO> getBoardLatest(){
         List<BoardVO> list = new ArrayList<>();
         try{

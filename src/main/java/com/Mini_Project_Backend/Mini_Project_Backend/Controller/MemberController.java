@@ -199,4 +199,5 @@ public class MemberController {
 
         return new ResponseEntity<>(isSent, HttpStatus.OK);
     }
+}
 
