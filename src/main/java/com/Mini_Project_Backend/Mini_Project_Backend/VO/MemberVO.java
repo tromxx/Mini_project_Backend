@@ -12,5 +12,7 @@ public class MemberVO {
     private String id;
     private String pwd;
     private String nickname;
+    private String favTeam;
     private Date join;
+
 }

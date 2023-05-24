@@ -27,7 +27,7 @@ public class MemberDAO {
                 System.out.println("ID : " + sqlId);
                 System.out.println("PW : " + sqlPwd);
                 System.out.println("AuthStatus : " + sqlAuth);
-                if (id.equals(sqlId) && pwd.equals(sqlPwd)&&sqlAuth.equals("Y")) {
+                if (id.equals(sqlId) && pwd.equals(sqlPwd) && sqlAuth.equals("Y")) {
                     Common.close(rs);
                     Common.close(stmt);
                     Common.close(conn);
@@ -50,19 +50,20 @@ public class MemberDAO {
         try {
             conn = Common.getConnection();
             stmt = conn.createStatement();
-            String sql = "SELECT * FROM MEMBER";
+            String sql = "SELECT * FROM MEMBER WHERE ID = '" + getId + "'";
             rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
                 String id = rs.getString("ID");
                 String pwd = rs.getString("PW");
                 String nickname = rs.getString("NICKNAME");
+                String favTeam = rs.getString("FAVTEAM");
                 Date join = rs.getDate("JOINDATE");
-
                 MemberVO vo = new MemberVO();
                 vo.setId(id);
                 vo.setPwd(pwd);
                 vo.setNickname(nickname);
+                vo.setFavTeam(favTeam);
                 vo.setJoin(join);
                 list.add(vo);
             }
@@ -116,13 +117,14 @@ public class MemberDAO {
     // 회원 가입
     public boolean memberRegister(String id, String pwd, String Nickname) {
         int result = 0;
-        String sql = "INSERT INTO MEMBER(MEMBER_NO, ID, PW, NICKNAME, JOINDATE) VALUES(member_seq.NEXTVAL, ?, ?, ?, SYSDATE)";
+        String sql = "INSERT INTO MEMBER(MEMBER_NO, ID, PW, NICKNAME, FAVTEAM, JOINDATE) VALUES(member_seq.NEXTVAL, ?, ?, ?, ?, SYSDATE)";
         try {
             conn = Common.getConnection();
             pStmt = conn.prepareStatement(sql);
             pStmt.setString(1, id);
             pStmt.setString(2, pwd);
             pStmt.setString(3, Nickname);
+            pStmt.setString(4, "0");
             result = pStmt.executeUpdate();
             System.out.println("회원 가입 DB 결과 확인 : " + result);
 
@@ -139,13 +141,13 @@ public class MemberDAO {
 
     // 회원탈퇴
     public boolean memberDelete(String Id) {
-        String sql = "DELETE * FROM MEMBER WHERE ID = " + "'" + Id + "'";
-
+        String sql = "DELETE FROM MEMBER WHERE ID = " + "'" + Id + "'";
+        int result = 0;
         try {
             conn = Common.getConnection();
             pStmt = conn.prepareStatement(sql);
-            System.out.println("회원 탈퇴 완료 : " + Id);
-
+            result = pStmt.executeUpdate();
+            System.out.println("삭제 결과" + Id + result);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -222,5 +224,86 @@ public class MemberDAO {
         return result;
     }
 
+    // 비밀번호 찾기에서 임시비밀번호 발급을 눌렀을 때 DB에서 원래 비밀번호를 tempPw로 바꿔주는 기능
+    public void changeTempPw(String id, String tempPw) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        boolean result = false;
 
+        try {
+            conn = Common.getConnection();
+            String sql = "SELECT * FROM MEMBER WHERE ID=?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, id);
+            rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                sql = "UPDATE MEMBER SET PW=? WHERE ID=?";
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, tempPw);
+                pstmt.setString(2, id);
+                pstmt.executeUpdate();
+                result = true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            Common.close(rs);
+            Common.close(pstmt);
+            Common.close(conn);
+        }
+        System.out.println("비밀번호 변경 result" + result);
+
+    }
+
+    public boolean memberUpdate(String id, String pwd, String nickname, String favTeam) {
+        int result = 0;
+        System.out.println(id);
+        System.out.println(pwd);
+        System.out.println(nickname);
+        System.out.println(favTeam);
+        String sql = "UPDATE MEMBER SET PW = ?, NICKNAME = ?, FAVTEAM = ? WHERE ID = ?";
+        try {
+            conn = Common.getConnection();
+            pStmt = conn.prepareStatement(sql);
+            pStmt.setString(1, pwd);
+            pStmt.setString(2, nickname);
+            pStmt.setString(3, favTeam);
+            pStmt.setString(4, id);
+            result = pStmt.executeUpdate();
+            System.out.println("회원정보 수정 결과 확인 : " + result);
+            System.out.println(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Common.close(pStmt);
+        Common.close(conn);
+
+        if (result >= 1) return true;
+        else return false;
+    }
+
+    public boolean saveToken(String id, String token) {
+        int result = 0;
+        System.out.println(id);
+        System.out.println(token);
+        String sql = "UPDATE MEMBER SET TOKEN = ? WHERE ID = ?";
+        try {
+            conn = Common.getConnection();
+            pStmt = conn.prepareStatement(sql);
+            pStmt.setString(1, token);
+            pStmt.setString(4, id);
+            result = pStmt.executeUpdate();
+            System.out.println("토큰 저장 결과 : " + result);
+            System.out.println(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Common.close(pStmt);
+        Common.close(conn);
+
+        if (result >= 1) return true;
+        else return false;
+    }
 }
