@@ -12,118 +12,109 @@ public class BoardDAO {
     private ResultSet rs = null;
     private PreparedStatement pStmt = null;
 
-    // 보드 ALL 가죠오기 첫번쨰
-    public Map<String, Object> getShortBoard() {
-        Map<String, Object> data = new HashMap<>();
+    public List<Integer> getBoardPage(String cat) {
+        List<Integer> page = new ArrayList<>();
+        String sql = "";
+        if (cat.equals("All")) {
+            sql = "SELECT COUNT(*) FROM BOARD";
+        } else if (cat.equals("LatestBoard")) {
+            sql = "SELECT COUNT(*) FROM BOARD";
+        } else {
+            sql = "SELECT COUNT(*) FROM BOARD WHERE BOARD_TITLE LIKE  '%" + cat + "%'";
+        }
         try {
-            String sql = "SELECT COUNT(*) FROM BOARD";
             conn = Common.getConnection();
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
             rs.next();
             int totalData = rs.getInt("COUNT(*)");
-            data.put("totalData", totalData);
-            Common.close(rs);
-            Common.close(stmt);
-            Common.close(conn);
+            page.add(totalData);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        try {
-            String sql = "SELECT BOARD_NO, BOARD_TITLE, BOARD_DATE, NICKNAME FROM BOARD B INNER JOIN MEMBER M ON B.MEMBER_NO = B.MEMBER_NO WHERE ROWNUM <= 10";
-            conn = Common.getConnection();
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery(sql);
-            List<Map<String, Object>> boardList = new ArrayList<>();
-            while (rs.next()) {
-                Map<String, Object> boardData = new HashMap<>();
-                int board_No = rs.getInt("BOARD_NO");
-                String board_Title = rs.getString("BOARD_TITLE");
-                String nickName = rs.getString("NICKNAME");
-                Date board_Date = rs.getDate("BOARD_DATE");
-                boardData.put("boardNo", board_No);
-                boardData.put("boardTitle", board_Title);
-                boardData.put("boardDate", board_Date);
-                boardData.put("nickName", nickName);
-                boardList.add(boardData);
-            }
-            Common.close(rs);
-            Common.close(stmt);
-            Common.close(conn);
-            data.put("data", boardList);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return data;
+        Common.close(rs);
+        Common.close(stmt);
+        Common.close(conn);
+        return page;
     }
 
-    public List<BoardVO> getAllBoardByPage(int page){
+    public List<BoardVO> getBoard(String cat, int page) {
         List<BoardVO> list = new ArrayList<>();
         int postPerPage = 10;
         int endNum = page * postPerPage;
-        int startNum = endNum - (postPerPage-1);
+        int startNum = endNum - (postPerPage - 1);
         try {
-            String sql = "SELECT BOARD_NO, BOARD_TITLE, NICKNAME, BOARD_DATE FROM (SELECT t.*, rownum AS r FROM (SELECT BOARD_NO, BOARD_TITLE, BOARD_DATE, NICKNAME FROM BOARD B INNER JOIN MEMBER M ON B.MEMBER_NO = B.MEMBER_NO) t WHERE rownum <= " + endNum + ") f WHERE r >=" + startNum;
+            String sql = "";
+            if (cat.equals("All")) {
+                sql = "SELECT f.BOARD_NO, f.BOARD_TITLE, f.BOARD_DATE, s.nickname FROM (SELECT t.*, rownum r FROM (SELECT * FROM BOARD ORDER BY BOARD_NO) t WHERE rownum <= "+endNum+") f JOIN member s ON f.MEMBER_NO = s.member_no WHERE f.r >= " + startNum;
+            } else if(cat.equals("LatestBoard")){
+                sql = "SELECT f.BOARD_NO, f.BOARD_TITLE, f.BOARD_DATE, s.nickname FROM (SELECT t.*, rownum r FROM (SELECT * FROM BOARD ORDER BY BOARD_DATE DESC) t WHERE rownum <= "+endNum+") f JOIN member s ON f.MEMBER_NO = s.member_no WHERE f.r >= " + startNum;
+            }else{
+                sql = "SELECT f.BOARD_NO, f.BOARD_TITLE, f.BOARD_DATE, s.nickname FROM (SELECT t.*, rownum r FROM (SELECT * FROM BOARD WHERE BOARD_TITLE LIKE '%"+cat+"%') t WHERE rownum <= "+endNum+") f JOIN member s ON f.MEMBER_NO = s.member_no WHERE f.r >= " + startNum;
+            }
             conn = Common.getConnection();
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
             while (rs.next()) {
                 int board_No = rs.getInt("BOARD_NO");
                 String board_Title = rs.getString("BOARD_TITLE");
-                String nickName = rs.getString("NICKNAME");
                 Date board_Date = rs.getDate("BOARD_DATE");
+                String nickName = rs.getString("NICKNAME");
 
                 BoardVO boardVO = new BoardVO();
                 boardVO.setBoardNo(board_No);
                 boardVO.setBoardTitle(board_Title);
-                boardVO.setNickName(nickName);
                 boardVO.setBoardDate(board_Date);
+                boardVO.setNickName(nickName);
                 list.add(boardVO);
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+        Common.close(rs);
+        Common.close(stmt);
+        Common.close(conn);
         return list;
     }
-    // 보드 번호로 정보 가죠오기
-    public List<BoardVO> getLongBoard(int boardno){
+
+    public List<BoardVO> getBoardInfo(int boardNo) {
         List<BoardVO> list = new ArrayList<>();
-        try{
-            String sql = "SELECT B.BOARD_NO, B.BOARD_TITLE, B.BOARD_IMG_URL, M.NICKNAME,  B.BOARD_CONTENT, B.BOARD_DATE FROM BOARD B INNER JOIN MEMBER M ON B.MEMBER_NO = M.MEMBER_NO WHERE BOARD_NO =" + boardno;
+        try {
+            String sql = "SELECT BOARD_NO, NICKNAME, BOARD_DATE, BOARD_IMG_URL, BOARD_CONTENT FROM BOARD f JOIN member s ON f.MEMBER_NO = s.member_no wHERE BOARD_NO = " + boardNo;
             conn = Common.getConnection();
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
-            while (rs.next()) {
-                int boardNo = rs.getInt("BOARD_NO");
-                String boardTitle = rs.getString("BOARD_TITLE");
-                String boardImgUrl = rs.getString("BOARD_IMG_URL");
-                String nickName = rs.getString("NICKNAME");
-                String boardContent = rs.getString("BOARD_CONTENT");
-                Date boardDate = rs.getDate("BOARD_DATE");
+            rs.next();
+            int board_No = rs.getInt("BOARD_NO");
+            String board_Title = rs.getString("BOARD_TITLE");
+            Date board_Date = rs.getDate("BOARD_DATE");
+            String nickName = rs.getString("NICKNAME");
+            String board_content = rs.getString("BOARD_CONTENT");
+            String board_img_url = rs.getString("BOARD_IMG_URL");
 
-                BoardVO boardVO = new BoardVO();
-                boardVO.setBoardNo(boardNo);
-                boardVO.setBoardTitle(boardTitle);
-                boardVO.setBoardImgUrl(boardImgUrl);
-                boardVO.setBoardContent(boardContent);
-                boardVO.setNickName(nickName);
-                boardVO.setBoardDate(boardDate);
-                list.add(boardVO);
-            }
-            Common.close(rs);
-            Common.close(stmt);
-            Common.close(conn);
-        }catch (Exception e){
+            BoardVO boardVO = new BoardVO();
+            boardVO.setBoardNo(board_No);
+            boardVO.setBoardTitle(board_Title);
+            boardVO.setBoardDate(board_Date);
+            boardVO.setNickName(nickName);
+            boardVO.setBoardImgUrl(board_img_url);
+            boardVO.setBoardContent(board_content);
+            list.add(boardVO);
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        return  list;
+        Common.close(rs);
+        Common.close(stmt);
+        Common.close(conn);
+        return list;
     }
-
     // 최신순 10개 가죠오기
     public List<BoardVO> getBoardLatest(){
         List<BoardVO> list = new ArrayList<>();
         try{
             String sql = "SELECT BOARD_NO, BOARD_TITLE, NICKNAME, BOARD_DATE FROM (SELECT BOARD_NO, BOARD_TITLE, NICKNAME, BOARD_DATE FROM BOARD JOIN MEMBER ON BOARD.MEMBER_NO = MEMBER.MEMBER_NO ORDER BY BOARD_DATE DESC)WHERE ROWNUM <= 20";
+
             conn = Common.getConnection();
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
