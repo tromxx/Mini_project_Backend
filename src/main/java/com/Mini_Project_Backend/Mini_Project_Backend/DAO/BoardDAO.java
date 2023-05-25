@@ -123,7 +123,7 @@ public class BoardDAO {
     public List<BoardVO> getBoardLatest(){
         List<BoardVO> list = new ArrayList<>();
         try{
-            String sql = "SELECT BOARD_NO, BOARD_TITLE, NICKNAME, BOARD_DATE FROM (SELECT BOARD_NO, BOARD_TITLE, NICKNAME, BOARD_DATE FROM BOARD JOIN MEMBER ON BOARD.MEMBER_NO = MEMBER.MEMBER_NO ORDER BY BOARD_DATE DESC)WHERE ROWNUM <= 10";
+            String sql = "SELECT BOARD_NO, BOARD_TITLE, NICKNAME, BOARD_DATE FROM (SELECT BOARD_NO, BOARD_TITLE, NICKNAME, BOARD_DATE FROM BOARD JOIN MEMBER ON BOARD.MEMBER_NO = MEMBER.MEMBER_NO ORDER BY BOARD_DATE DESC)WHERE ROWNUM <= 20";
             conn = Common.getConnection();
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);

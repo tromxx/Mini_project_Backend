@@ -9,6 +9,7 @@ import java.sql.Date;
 @Setter
 
 public class MemberVO {
+    private int memberNo;
     private String id;
     private String pwd;
     private String nickname;

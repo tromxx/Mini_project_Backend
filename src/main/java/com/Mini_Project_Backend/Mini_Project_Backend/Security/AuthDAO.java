@@ -22,6 +22,7 @@ public class AuthDAO {
 
             while(rs.next()) {
                 MemberVO vo = new MemberVO();
+                vo.setMemberNo(rs.getInt("MEMBER_NO"));
                 vo.setId(rs.getString("ID"));
                 System.out.println();
                 vo.setPwd(rs.getString("PW"));
