@@ -22,7 +22,7 @@ public class BoardDAO {
             rs = stmt.executeQuery(sql);
             rs.next();
             int totalData = rs.getInt("COUNT(*)");
-            data.put("TotalData", totalData);
+            data.put("totalData", totalData);
             Common.close(rs);
             Common.close(stmt);
             Common.close(conn);
@@ -50,7 +50,6 @@ public class BoardDAO {
             Common.close(rs);
             Common.close(stmt);
             Common.close(conn);
-            System.out.println("finish");
             data.put("data", boardList);
         } catch (Exception e) {
             e.printStackTrace();
