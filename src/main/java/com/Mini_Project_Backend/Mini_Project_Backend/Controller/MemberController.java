@@ -152,7 +152,7 @@ public class MemberController {
         return new ResponseEntity<>(isTrue, HttpStatus.OK);
     }
 
-     // POST : 비밀번호 찾기 이메일 발송
+    // POST : 비밀번호 찾기 이메일 발송
     @PostMapping("/findpw")
     public ResponseEntity<Boolean> findPw(@RequestBody Map<String, String> data) {
         String getId = data.get("id");
@@ -171,7 +171,7 @@ public class MemberController {
             String tempPw = String.valueOf(random.nextInt(max - min + 1) + min);
             System.out.println(tempPw);
             // DB의 원래 비밀번호를 임시비밀번호로 바꿔 저장
-            dao.changeTempPw(getId,tempPw);
+            dao.changeTempPw(getId, tempPw);
 
             // 이메일에 들어갈 내용
             String htmlContent = "<div style=\"text-align: center; display:flex; justify-contents:center; text-align:center;\">"
@@ -200,3 +200,4 @@ public class MemberController {
         return new ResponseEntity<>(isSent, HttpStatus.OK);
     }
 
+}
