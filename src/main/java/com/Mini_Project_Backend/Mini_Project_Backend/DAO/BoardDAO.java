@@ -40,7 +40,7 @@ public class BoardDAO {
 
     public List<BoardVO> getBoard(String cat, int page) {
         List<BoardVO> list = new ArrayList<>();
-        int postPerPage = 10;
+        int postPerPage = 20;
         int endNum = page * postPerPage;
         int startNum = endNum - (postPerPage - 1);
         try {
