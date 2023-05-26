@@ -81,34 +81,39 @@ public class BoardDAO {
     public List<BoardVO> getBoardInfo(int boardNo) {
         List<BoardVO> list = new ArrayList<>();
         try {
-            String sql = "SELECT BOARD_NO, NICKNAME, BOARD_DATE, BOARD_IMG_URL, BOARD_CONTENT FROM BOARD f JOIN member s ON f.MEMBER_NO = s.member_no wHERE BOARD_NO = " + boardNo;
+            String sql = "SELECT BOARD_NO, BOARD_TITLE, BOARD_DATE, NICKNAME, BOARD_CONTENT, BOARD_IMG_URL FROM BOARD f JOIN member s ON f.MEMBER_NO = s.member_no WHERE BOARD_NO = ?";
             conn = Common.getConnection();
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery(sql);
-            rs.next();
-            int board_No = rs.getInt("BOARD_NO");
-            String board_Title = rs.getString("BOARD_TITLE");
-            Date board_Date = rs.getDate("BOARD_DATE");
-            String nickName = rs.getString("NICKNAME");
-            String board_content = rs.getString("BOARD_CONTENT");
-            String board_img_url = rs.getString("BOARD_IMG_URL");
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, boardNo);
+            ResultSet rs = stmt.executeQuery();
 
-            BoardVO boardVO = new BoardVO();
-            boardVO.setBoardNo(board_No);
-            boardVO.setBoardTitle(board_Title);
-            boardVO.setBoardDate(board_Date);
-            boardVO.setNickName(nickName);
-            boardVO.setBoardImgUrl(board_img_url);
-            boardVO.setBoardContent(board_content);
-            list.add(boardVO);
+            if (rs.next()) {
+                int board_No = rs.getInt("BOARD_NO");
+                String board_Title = rs.getString("BOARD_TITLE");
+                Date board_Date = rs.getDate("BOARD_DATE");
+                String nickName = rs.getString("NICKNAME");
+                String board_content = rs.getString("BOARD_CONTENT");
+                String board_img_url = rs.getString("BOARD_IMG_URL");
+
+                BoardVO boardVO = new BoardVO();
+                boardVO.setBoardNo(board_No);
+                boardVO.setBoardTitle(board_Title);
+                boardVO.setBoardDate(board_Date);
+                boardVO.setNickName(nickName);
+                boardVO.setBoardContent(board_content);
+                boardVO.setBoardImgUrl(board_img_url);
+                list.add(boardVO);
+            }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            Common.close(rs);
+            Common.close(stmt);
+            Common.close(conn);
         }
-        Common.close(rs);
-        Common.close(stmt);
-        Common.close(conn);
         return list;
     }
+
     // 최신순 10개 가죠오기
     public List<BoardVO> getBoardLatest(){
         List<BoardVO> list = new ArrayList<>();
