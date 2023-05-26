@@ -23,30 +23,37 @@ public class BoardController {
     public ResponseEntity<List<Integer>> getBoardPage(@RequestParam String cat) {
         BoardDAO dao = new BoardDAO();
         List<Integer> list = dao.getBoardPage(cat);
-        return new ResponseEntity<>(list,HttpStatus.OK);
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
     @GetMapping("/Homeplate/View")
     public ResponseEntity<List<BoardVO>> getBoardPage(@RequestParam int board_No) {
         BoardDAO dao = new BoardDAO();
         List<BoardVO> list = dao.getBoardInfo(board_No);
-        return new ResponseEntity<>(list,HttpStatus.OK);
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
     @GetMapping("/Latest")
     public ResponseEntity<List<BoardVO>> getLatestBoard(@RequestParam String cat) {
         BoardDAO boardDAO = new BoardDAO();
-
         List<BoardVO> list = boardDAO.getBoardLatest();
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
+
     @PostMapping("/Homeplate/Write")
-    public ResponseEntity<Boolean> updateBoard(@RequestBody Map<String, String>data){
+    public ResponseEntity<Boolean> updateBoard(@RequestBody Map<String, String> data) {
         int getMemberNo = Integer.parseInt(data.get("memberNo"));
         String getBoardTitle = data.get("boardTitle");
         String getBoardContent = data.get("boardContent");
         BoardDAO dao = new BoardDAO();
         boolean isTure = dao.insertBoard(getMemberNo, getBoardTitle, getBoardContent);
         return new ResponseEntity<>(isTure, HttpStatus.OK);
+    }
+
+    @GetMapping("Mypage/board")
+    public ResponseEntity<List<BoardVO>> getMyboard(@RequestParam int memberNo) {
+        BoardDAO dao = new BoardDAO();
+        List<BoardVO> list = dao.getMyBoard(memberNo);
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 }
