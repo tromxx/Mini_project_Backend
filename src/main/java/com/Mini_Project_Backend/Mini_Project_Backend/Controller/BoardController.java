@@ -40,4 +40,13 @@ public class BoardController {
         List<BoardVO> list = boardDAO.getBoardLatest();
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
+    @PostMapping("/Homeplate/Write")
+    public ResponseEntity<Boolean> updateBoard(@RequestBody Map<String, String>data){
+        int getMemberNo = Integer.parseInt(data.get("memberNo"));
+        String getBoardTitle = data.get("boardTitle");
+        String getBoardContent = data.get("boardContent");
+        BoardDAO dao = new BoardDAO();
+        boolean isTure = dao.insertBoard(getMemberNo, getBoardTitle, getBoardContent);
+        return new ResponseEntity<>(isTure, HttpStatus.OK);
+    }
 }

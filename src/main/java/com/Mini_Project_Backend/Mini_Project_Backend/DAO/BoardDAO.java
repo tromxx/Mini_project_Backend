@@ -145,8 +145,24 @@ public class BoardDAO {
         }
         return list;
     }
+    public boolean insertBoard(int memberNo, String board_Title, String board_Content){
+        int result = 0;
+        String sql = "INSERT INTO BOARD (BOARD_NO, MEMBER_NO, BOARD_TITLE, BOARD_CONTENT, BOARD_DATE) VALUES(BOARD_SEQ.NEXTVAL, ?, ?, ?, SYSDATE)";
+        try {
+            conn = Common.getConnection();
+            pStmt = conn.prepareStatement(sql);
+            pStmt.setInt(1,memberNo);
+            pStmt.setString(2,board_Title);
+            pStmt.setString(3,board_Content);
+            result = pStmt.executeUpdate();
+            System.out.println("보드 업데이트 완료");
 
-
-
-
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Common.close(pStmt);
+        Common.close(conn);
+        if(result == 1) return true;
+        else return false;
+    }
 }
