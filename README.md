@@ -1,5 +1,5 @@
 <div align=center>
-	<h1>Bench Clearing</h1>
+	<h1>Mini_project_Backend</h1>
 </div>
 <br>
 <div align=center>
