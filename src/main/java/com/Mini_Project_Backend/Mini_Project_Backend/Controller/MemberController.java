@@ -27,11 +27,11 @@ import java.util.UUID;
 
 // 크로스오리진 에러를 체크하지 말라고 명령하는 명령어
 @RestController
-
+@CrossOrigin(origins = "http://localhost:3000")
 public class MemberController {
     
     String backend = "http://localhost:8111";
-
+    String frontend = "http://localhost:3000";
     @Autowired
     private JavaMailSender mailSender;
 

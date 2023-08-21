@@ -136,5 +136,36 @@ public class BoardDAO {
       
       return boardVO;
    }
+   
+   public List<BoardVO> getBoardLatest(){
+      List<BoardVO> list = new ArrayList<>();
+      try{
+         String sql = "SELECT BOARD_NO, BOARD_TITLE, NICKNAME, BOARD_DATE FROM (SELECT BOARD_NO, BOARD_TITLE, NICKNAME, BOARD_DATE FROM BOARD JOIN MEMBER ON BOARD.MEMBER_NO = MEMBER.MEMBER_NO ORDER BY BOARD_DATE DESC)WHERE ROWNUM <= 18";
+         
+         conn = Common.getConnection();
+         stmt = conn.createStatement();
+         rs = stmt.executeQuery(sql);
+         while (rs.next()) {
+            int boardNo = rs.getInt("BOARD_NO");
+            String boardTitle = rs.getString("BOARD_TITLE");
+            String nickName = rs.getString("NICKNAME");
+            Date boardDate = rs.getDate("BOARD_DATE");
+            
+            BoardVO boardVO = new BoardVO();
+            boardVO.setBoardNo(boardNo);
+            boardVO.setBoardTitle(boardTitle);
+            boardVO.setNickName(nickName);
+            boardVO.setBoardDate(boardDate);
+            
+            list.add(boardVO);
+         }
+         Common.close(rs);
+         Common.close(stmt);
+         Common.close(conn);
+      }catch (Exception e){
+         e.printStackTrace();
+      }
+      return list;
+   }
 
 }

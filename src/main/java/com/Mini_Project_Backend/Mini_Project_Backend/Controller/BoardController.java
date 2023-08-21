@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-
+@CrossOrigin(origins = "http://localhost:3000")
 public class BoardController {
     
     @GetMapping("/Homeplate")
@@ -40,5 +40,11 @@ public class BoardController {
         BoardDAO dao = new BoardDAO();
         boolean isTure = dao.insertBoard(getBoardTitle, getBoardContent, getBoardImage);
         return new ResponseEntity<>(isTure, HttpStatus.OK);
+    }
+    @GetMapping("/Latest")
+    public ResponseEntity<List<BoardVO>> getLatestBoard() {
+        BoardDAO boardDAO = new BoardDAO();
+        List<BoardVO> list = boardDAO.getBoardLatest();
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 }
