@@ -1,6 +1,6 @@
 package com.Mini_Project_Backend.Mini_Project_Backend.DAO;
 
-import com.Mini_Project_Backend.Mini_Project_Backend.Common.Common;
+import com.Mini_Project_Backend.Mini_Project_Backend.Util.Common;
 import com.Mini_Project_Backend.Mini_Project_Backend.VO.WeeklyVO;
 
 import java.sql.*;

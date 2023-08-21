@@ -1,6 +1,8 @@
 package com.Mini_Project_Backend.Mini_Project_Backend.DAO;
-import com.Mini_Project_Backend.Mini_Project_Backend.Common.Common;
+import com.Mini_Project_Backend.Mini_Project_Backend.Util.Common;
+import com.Mini_Project_Backend.Mini_Project_Backend.Util.SecurityUtil;
 import com.Mini_Project_Backend.Mini_Project_Backend.VO.MemberVO;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -11,7 +13,8 @@ public class MemberDAO {
     private Statement stmt = null;
     private ResultSet rs = null;
     private PreparedStatement pStmt = null;
-
+    
+    
     // 로그인 체크
     public boolean loginCheck(String id, String pwd) {
         try {
@@ -41,39 +44,6 @@ public class MemberDAO {
             e.printStackTrace();
         }
         return false;
-    }
-
-    // 회원정보 조회
-
-    public List<MemberVO> memberSelect(String getId) {
-        List<MemberVO> list = new ArrayList<>();
-        try {
-            conn = Common.getConnection();
-            stmt = conn.createStatement();
-            String sql = "SELECT * FROM MEMBER WHERE ID = '" + getId + "'";
-            rs = stmt.executeQuery(sql);
-
-            while (rs.next()) {
-                String id = rs.getString("ID");
-                String pwd = rs.getString("PW");
-                String nickname = rs.getString("NICKNAME");
-                String favTeam = rs.getString("FAVTEAM");
-                Date join = rs.getDate("JOINDATE");
-                MemberVO vo = new MemberVO();
-                vo.setId(id);
-                vo.setPwd(pwd);
-                vo.setNickname(nickname);
-                vo.setFavTeam(favTeam);
-                vo.setJoin(join);
-                list.add(vo);
-            }
-            Common.close(rs);
-            Common.close(stmt);
-            Common.close(conn);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
     }
 
     // 회원 가입 여부 확인(아이디)
@@ -279,33 +249,32 @@ public class MemberDAO {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        Common.close(rs);
         Common.close(pStmt);
         Common.close(conn);
-
         if (result >= 1) return true;
         else return false;
     }
-
-    public boolean saveToken(String id, String token) {
-        int result = 0;
-        System.out.println(id);
-        System.out.println(token);
-        String sql = "UPDATE MEMBER SET TOKEN = ? WHERE ID = ?";
+    
+    public MemberVO getMemberInfo() {
+        MemberVO memberVO = new MemberVO();
+        int memberId = SecurityUtil.getMemberId();
+        String sql = "SELECT MEMBER_NO, ID, FAVTEAM, NICKNAME FROM MEMBER WHERE MEMBER_NO = "+memberId;
         try {
             conn = Common.getConnection();
-            pStmt = conn.prepareStatement(sql);
-            pStmt.setString(1, token);
-            pStmt.setString(4, id);
-            result = pStmt.executeUpdate();
-            System.out.println("토큰 저장 결과 : " + result);
-            System.out.println(result);
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            rs.next();
+            memberVO.setMemberNo(rs.getInt("MEMBER_NO"));
+            memberVO.setId(rs.getString("ID"));
+            memberVO.setNickname(rs.getString("NICKNAME"));
+            memberVO.setFavTeam("FAVTEAM");
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Common.close(pStmt);
+        Common.close(rs);
+        Common.close(stmt);
         Common.close(conn);
-
-        if (result >= 1) return true;
-        else return false;
+        return memberVO;
     }
 }

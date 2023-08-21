@@ -1,4 +1,4 @@
-package com.Mini_Project_Backend.Mini_Project_Backend.Common;
+package com.Mini_Project_Backend.Mini_Project_Backend.Util;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

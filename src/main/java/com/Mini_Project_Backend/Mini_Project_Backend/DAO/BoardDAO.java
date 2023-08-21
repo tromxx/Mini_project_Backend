@@ -1,6 +1,7 @@
 package com.Mini_Project_Backend.Mini_Project_Backend.DAO;
 
-import com.Mini_Project_Backend.Mini_Project_Backend.Common.Common;
+import com.Mini_Project_Backend.Mini_Project_Backend.Util.Common;
+import com.Mini_Project_Backend.Mini_Project_Backend.Util.SecurityUtil;
 import com.Mini_Project_Backend.Mini_Project_Backend.VO.BoardVO;
 import java.sql.*;
 import java.sql.Date;
@@ -77,83 +78,18 @@ public class BoardDAO {
         Common.close(conn);
         return list;
     }
-
-    public List<BoardVO> getBoardInfo(int boardNo) {
-        List<BoardVO> list = new ArrayList<>();
-        try {
-            String sql = "SELECT BOARD_NO, BOARD_TITLE, BOARD_DATE, NICKNAME, BOARD_CONTENT, BOARD_IMG_URL FROM BOARD f JOIN member s ON f.MEMBER_NO = s.member_no WHERE BOARD_NO = ?";
-            conn = Common.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, boardNo);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                int board_No = rs.getInt("BOARD_NO");
-                String board_Title = rs.getString("BOARD_TITLE");
-                Date board_Date = rs.getDate("BOARD_DATE");
-                String nickName = rs.getString("NICKNAME");
-                String board_content = rs.getString("BOARD_CONTENT");
-                String board_img_url = rs.getString("BOARD_IMG_URL");
-
-                BoardVO boardVO = new BoardVO();
-                boardVO.setBoardNo(board_No);
-                boardVO.setBoardTitle(board_Title);
-                boardVO.setBoardDate(board_Date);
-                boardVO.setNickName(nickName);
-                boardVO.setBoardContent(board_content);
-                boardVO.setBoardImgUrl(board_img_url);
-                list.add(boardVO);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            Common.close(rs);
-            Common.close(stmt);
-            Common.close(conn);
-        }
-        return list;
-    }
-
-    // 최신순 10개 가죠오기
-    public List<BoardVO> getBoardLatest(){
-        List<BoardVO> list = new ArrayList<>();
-        try{
-            String sql = "SELECT BOARD_NO, BOARD_TITLE, NICKNAME, BOARD_DATE FROM (SELECT BOARD_NO, BOARD_TITLE, NICKNAME, BOARD_DATE FROM BOARD JOIN MEMBER ON BOARD.MEMBER_NO = MEMBER.MEMBER_NO ORDER BY BOARD_DATE DESC)WHERE ROWNUM <= 18";
-
-            conn = Common.getConnection();
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery(sql);
-            while (rs.next()) {
-                int boardNo = rs.getInt("BOARD_NO");
-                String boardTitle = rs.getString("BOARD_TITLE");
-                String nickName = rs.getString("NICKNAME");
-                Date boardDate = rs.getDate("BOARD_DATE");
-
-                BoardVO boardVO = new BoardVO();
-                boardVO.setBoardNo(boardNo);
-                boardVO.setBoardTitle(boardTitle);
-                boardVO.setNickName(nickName);
-                boardVO.setBoardDate(boardDate);
-
-                list.add(boardVO);
-            }
-            Common.close(rs);
-            Common.close(stmt);
-            Common.close(conn);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return list;
-    }
-    public boolean insertBoard(int memberNo, String board_Title, String board_Content){
+    
+    public boolean insertBoard(String board_Title, String board_Content, String board_Image){
         int result = 0;
-        String sql = "INSERT INTO BOARD (BOARD_NO, MEMBER_NO, BOARD_TITLE, BOARD_CONTENT, BOARD_DATE) VALUES(BOARD_SEQ.NEXTVAL, ?, ?, ?, SYSDATE)";
+        int memberNo = SecurityUtil.getMemberId();
+        String sql = "INSERT INTO BOARD (BOARD_NO, MEMBER_NO, BOARD_TITLE, Board_Content, BOARD_IMG_URL, BOARD_DATE) VALUES(BOARD_SEQ.NEXTVAL, ?, ?, ?, ?,SYSDATE)";
         try {
             conn = Common.getConnection();
             pStmt = conn.prepareStatement(sql);
             pStmt.setInt(1,memberNo);
             pStmt.setString(2,board_Title);
             pStmt.setString(3,board_Content);
+            pStmt.setString(4,board_Image);
             result = pStmt.executeUpdate();
             System.out.println("보드 업데이트 완료");
 
@@ -162,37 +98,43 @@ public class BoardDAO {
         }
         Common.close(pStmt);
         Common.close(conn);
-        if(result == 1) return true;
-        else return false;
+       return result == 1;
     }
-
-    // 나의 보드 가죠오기
-    public List<BoardVO> getMyBoard(int memberNo) {
-        List<BoardVO> list = new ArrayList<>();
-        try {
-            String sql = "SELECT BOARD_TITLE, BOARD_DATE FROM BOARD WHERE MEMBER_NO = ? AND ROWNUM < 10";
-            conn = Common.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, memberNo);
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                String boardTitle = rs.getString("BOARD_TITLE");
-                Date boardDate = rs.getDate("BOARD_DATE");
-
-                BoardVO boardVO = new BoardVO();
-                boardVO.setBoardTitle(boardTitle);
-                boardVO.setBoardDate(boardDate);
-
-                list.add(boardVO);
-            }
-            Common.close(rs);
-            Common.close(stmt);
-            Common.close(conn);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
+   
+   public BoardVO getBoardInfo(int boardNo) {
+      
+      BoardVO boardVO = new BoardVO();
+      try {
+         String sql = "SELECT BOARD_NO, BOARD_TITLE, BOARD_DATE, NICKNAME, BOARD_CONTENT, BOARD_IMG_URL FROM BOARD f JOIN member s ON f.MEMBER_NO = s.member_no WHERE BOARD_NO = ?";
+         conn = Common.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql);
+         stmt.setInt(1, boardNo);
+         ResultSet rs = stmt.executeQuery();
+         
+         if (rs.next()) {
+            int board_No = rs.getInt("BOARD_NO");
+            String board_Title = rs.getString("BOARD_TITLE");
+            Date board_Date = rs.getDate("BOARD_DATE");
+            String nickName = rs.getString("NICKNAME");
+            String board_content = rs.getString("BOARD_CONTENT");
+            String board_img_url = rs.getString("BOARD_IMG_URL");
+            
+            boardVO.setBoardNo(board_No);
+            boardVO.setBoardTitle(board_Title);
+            boardVO.setBoardDate(board_Date);
+            boardVO.setNickName(nickName);
+            boardVO.setBoardContent(board_content);
+            boardVO.setBoardImgUrl(board_img_url);
+         }
+      } catch (Exception e) {
+         e.printStackTrace();
+      } finally {
+         Common.close(rs);
+         Common.close(stmt);
+         Common.close(conn);
+      }
+      
+      return boardVO;
+   }
 
 }

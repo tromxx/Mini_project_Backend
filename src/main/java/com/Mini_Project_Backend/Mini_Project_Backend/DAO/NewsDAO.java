@@ -1,12 +1,14 @@
 package com.Mini_Project_Backend.Mini_Project_Backend.DAO;
 
-import com.Mini_Project_Backend.Mini_Project_Backend.Common.Common;
+import com.Mini_Project_Backend.Mini_Project_Backend.Util.Common;
+import com.Mini_Project_Backend.Mini_Project_Backend.VO.NewsLikeDislikeVO;
 import com.Mini_Project_Backend.Mini_Project_Backend.VO.NewsVO;
-import org.springframework.http.converter.json.GsonBuilderUtils;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class NewsDAO {
     private Connection conn = null;
@@ -82,8 +84,8 @@ public class NewsDAO {
     }
 
     // news_number 로 뉴스 정보 조회 하기
-    public List<NewsVO> getNewsInfo(int news_Numbers) {
-        List<NewsVO> list = new ArrayList<>();
+    public NewsVO getNewsInfo(int news_Numbers) {
+        NewsVO newsVO = new NewsVO();
         try {
             String sql = "SELECT NEWS_NO, NEWS_TITLE, NEWS_IMAGE_URL, NEWS_LONG_CONTENT FROM NEWS WHERE NEWS_NO = '" + news_Numbers + "'";
             conn = Common.getConnection();
@@ -94,18 +96,16 @@ public class NewsDAO {
             String news_title = rs.getString("NEWS_TITLE");
             String news_Image_Url = rs.getString("NEWS_IMAGE_URL");
             String news_Long_Content = rs.getString("NEWS_LONG_CONTENT");
-            NewsVO newsVO = new NewsVO();
             newsVO.setNews_No(news_No);
             newsVO.setNews_Title(news_title);
             newsVO.setNews_Image_Url(news_Image_Url);
             newsVO.setNews_Long_Content(news_Long_Content);
-            list.add(newsVO);
         } catch (Exception e) {
             e.printStackTrace();
         }
         Common.close(rs);
         Common.close(stmt);
         Common.close(conn);
-        return list;
+        return newsVO;
     }
 }

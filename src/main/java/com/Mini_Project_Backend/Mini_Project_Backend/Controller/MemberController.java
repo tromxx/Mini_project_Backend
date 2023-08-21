@@ -1,14 +1,19 @@
 package com.Mini_Project_Backend.Mini_Project_Backend.Controller;
 
 import com.Mini_Project_Backend.Mini_Project_Backend.DAO.MemberDAO;
+import com.Mini_Project_Backend.Mini_Project_Backend.Security.BCUserDetailsService;
 import com.Mini_Project_Backend.Mini_Project_Backend.Security.TokenService;
+import com.Mini_Project_Backend.Mini_Project_Backend.Util.SecurityUtil;
 import com.Mini_Project_Backend.Mini_Project_Backend.VO.MemberVO;
 
-import oracle.ucp.proxy.annotation.Post;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.bind.annotation.*;
@@ -19,58 +24,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
 
-@CrossOrigin(origins = "http://localhost:3000")
 // 크로스오리진 에러를 체크하지 말라고 명령하는 명령어
 @RestController
 
 public class MemberController {
+    
+    String backend = "http://localhost:8111";
+
     @Autowired
     private JavaMailSender mailSender;
 
-    String backend = "http://localhost:8111";
-    String frontend = "http://localhost:3000";
-    // POST : 로그인
-
-
-
+    @Autowired
+    private BCUserDetailsService userDetailsService;
 
     @Autowired
     private TokenService tokenService;
-
-//    @PostMapping("/login")
-//    public ResponseEntity<Boolean> memberLogin(HttpServletResponse response, @RequestBody Map<String, String> loginData) {
-//        String id = loginData.get("id");
-//        String pwd = loginData.get("pwd");
-//        MemberDAO dao = new MemberDAO();
-//        boolean result = dao.loginCheck(id, pwd);
-//
-//        if (result) {
-//            // 로그인 성공 시 토큰 생성
-//            String authToken = tokenService.generateAuthToken();
-//            Cookie cookie = new Cookie("authToken", authToken);
-//            cookie.setMaxAge(3600); // 쿠키 유효 기간 설정 (예: 1시간)
-//            response.addCookie(cookie);
-//
-//            dao.saveToken(id, authToken);
-//        }
-//
-//        return new ResponseEntity<>(result, HttpStatus.OK);
-//    }
-
-
-    // GET : 회원조회
-
-    @GetMapping("/member")
-    public ResponseEntity<List<MemberVO>> memberList(@RequestParam String id) {
-        System.out.println("ID : " + id);
-        MemberDAO dao = new MemberDAO();
-        List<MemberVO> list = dao.memberSelect(id);
-
-        return new ResponseEntity<>(list, HttpStatus.OK);
-    }
 
     @GetMapping("/nickname")
     public ResponseEntity<Boolean> nicknameList(@RequestParam String nickname) {
@@ -87,7 +56,7 @@ public class MemberController {
         boolean isTrue = dao.regMemberCheck(id);
         return new ResponseEntity<>(isTrue, HttpStatus.OK);
     }
-
+    
     // POST : 회원 가입
     @PostMapping("/new")
     public ResponseEntity<Boolean> memberRegister(@RequestBody Map<String, String> regData) {
@@ -135,16 +104,44 @@ public class MemberController {
 
         return new ResponseEntity<>(isTrue, HttpStatus.OK);
     }
-
+    
     @GetMapping("/emailAuth")
     public RedirectView emailAuth(@RequestParam String id, @RequestParam String authKey) {
         MemberDAO dao = new MemberDAO();
         boolean result = dao.updateAuthKeyByAuthKey(id, authKey);
-
-        return new RedirectView(frontend + "/login");
+        return new RedirectView(backend + "/login");
     }
-
-
+    
+    
+    @PostMapping("/login")
+    public ResponseEntity<String> createAuthToken(@RequestBody Map<String, String> authRequest) throws Exception {
+        UserDetails userDetails = userDetailsService
+          .loadUserByUsername(authRequest.get("email"));
+        if (!userDetails.getPassword().equals(authRequest.get("pwd"))) {
+            throw new BadCredentialsException("이메일, 비밀번호가 맞지 않습니다.");
+        }
+        final String jwt = tokenService.generateAuthToken(userDetails);
+        return new ResponseEntity<>(jwt, HttpStatus.OK);
+    }
+    
+    @PostMapping("/user")
+    public ResponseEntity<MemberVO> getMemberInfo() {
+        MemberDAO dao = new MemberDAO();
+        MemberVO memberVO = dao.getMemberInfo();
+        return new ResponseEntity<>(memberVO, HttpStatus.OK);
+    }
+    
+    @PostMapping("/editinfo")
+    public ResponseEntity<Boolean> editInfo(@RequestBody Map<String, String> regData) {
+        String getId = regData.get("id");
+        String getPwd = regData.get("pwd");
+        String getNickname = regData.get("nickname");
+        String getFavTeam = regData.get("favTeam");
+        MemberDAO dao = new MemberDAO();
+        boolean isUpdated = dao.memberUpdate(getId, getPwd, getNickname, getFavTeam);
+        return new ResponseEntity<>(isUpdated, HttpStatus.OK);
+    }
+    
     // POST : 회원 탈퇴
     @PostMapping("/del")
     public ResponseEntity<Boolean> memberDelete(@RequestBody Map<String, String> delData) {
